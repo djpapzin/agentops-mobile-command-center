@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ summary.current_goal }} · AgentOps Mobile Command Center</title>
+  <style>
+    :root { color-scheme: dark; }
+    body { font-family: Inter, system-ui, sans-serif; margin: 0; background: #0b1220; color: #e5eefc; }
+    header { padding: 24px; background: linear-gradient(135deg, #101a33, #0b1220); border-bottom: 1px solid #1f2b4a; }
+    main { padding: 18px; max-width: 1100px; margin: 0 auto; }
+    .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+    .card { background: #121c33; border: 1px solid #253454; border-radius: 16px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.2); }
+    .muted { color: #9fb2d1; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid #24314d; vertical-align: top; }
+    .pill { display: inline-block; padding: 4px 10px; border-radius: 999px; background: #1c2b4d; margin-right: 6px; }
+    .wide { overflow-x: auto; }
+    code { background: #0a1121; padding: 2px 6px; border-radius: 6px; }
+    .two-col { display:grid; gap:16px; grid-template-columns: 2fr 1fr; }
+    @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>AgentOps Mobile Command Center</h1>
+    <p class="muted">Telegram-first control room for mobile founders and operators · {{ public_url }}</p>
+    <p>
+      <span class="pill">Goal: {{ summary.current_goal }}</span>
+      <span class="pill">Runs: {{ summary.total_runs }}</span>
+      <span class="pill">Pending approvals: {{ summary.pending_approvals }}</span>
+      <span class="pill">Approved cards: {{ summary.approved_cards }}</span>
+    </p>
+  </header>
+  <main>
+    <section class="grid">
+      <div class="card"><h3>Mobile commands</h3><p class="muted"><code>/goal</code> <code>/status</code> <code>/storage</code> <code>/review_pr</code> <code>/approve</code></p></div>
+      <div class="card"><h3>Cost-aware routing</h3><p class="muted">Local model for cheap deterministic tasks, Fireworks for synthesis, AMD-hosted model for higher-accuracy review and approvals.</p></div>
+      <div class="card"><h3>System health</h3><p class="muted">The same data powers the bot and the dashboard, so the mobile operator sees exactly what the agent knows.</p></div>
+    </section>
+
+    <section class="two-col" style="margin-top:16px;">
+      <div class="card wide">
+        <h3>Recent runs</h3>
+        <table>
+          <thead>
+            <tr><th>ID</th><th>Task</th><th>Model</th><th>Tokens</th><th>Cost</th><th>Approval</th><th>Summary</th></tr>
+          </thead>
+          <tbody>
+          {% for run in runs %}
+            <tr>
+              <td>#{{ run.id }}</td>
+              <td>{{ run.task_type }}</td>
+              <td>{{ run.model_provider }} · {{ run.model_name }}</td>
+              <td>{{ run.estimated_tokens }}</td>
+              <td>${{ '%.4f'|format(run.estimated_cost_usd) }}</td>
+              <td>{{ run.approval_status }}</td>
+              <td>{{ run.result_summary }}</td>
+            </tr>
+          {% else %}
+            <tr><td colspan="7" class="muted">No runs yet. Start with /goal or /storage.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3>Pending approvals</h3>
+        {% for approval in approvals %}
+          <div style="margin-bottom:12px;">
+            <strong>#{{ approval.id }} · {{ approval.title }}</strong><br>
+            <span class="muted">{{ approval.status }}</span>
+          </div>
+        {% else %}
+          <p class="muted">Nothing waiting for approval.</p>
+        {% endfor %}
+      </div>
+    </section>
+  </main>
+</body>
+</html>
