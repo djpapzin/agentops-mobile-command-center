@@ -7,6 +7,8 @@ Built for **AMD Developer Hackathon: ACT II** with a lightweight MVP focused on:
 
 ![AgentOps Mobile Command Center hero banner](assets/README-hero.jpg)
 
+![AgentOps Mobile Command Center social card](assets/README-social.png)
+
 - mobile-first goal control from Telegram
 - deterministic routing between local/cheap and remote AMD/Fireworks models
 - PR review summaries and safe-to-merge cards
