@@ -9,6 +9,8 @@ Built for **AMD Developer Hackathon: ACT II** with a lightweight MVP focused on:
 
 ![AgentOps Mobile Command Center social card](assets/README-social.png)
 
+**Demo teaser:** [assets/agentops-demo-teaser.mp4](assets/agentops-demo-teaser.mp4)
+**Teaser script:** [docs/demo_teaser_script.md](docs/demo_teaser_script.md)
 **Demo video:** [assets/agentops-demo-live-screenshots.mp4](assets/agentops-demo-live-screenshots.mp4)
 **Archive demo:** [assets/agentops-demo.mp4](assets/agentops-demo.mp4)
 **Subtitled demo:** [assets/agentops-demo-subtitled.mp4](assets/agentops-demo-subtitled.mp4)

@@ -28,8 +28,10 @@ Telegram-first AI ops console for mobile founders and operators, with a dashboar
 - `assets/README-hero.jpg`
 - `assets/README-social.png`
 - `assets/demo-dashboard.png`
+- `assets/agentops-demo-teaser.mp4`
 - `assets/agentops-demo-live-screenshots.mp4`
 - `assets/agentops-demo-telegram.mp4`
+- `docs/demo_teaser_script.md`
 
 ## Suggested judge-facing blurb
 AgentOps Mobile Command Center turns Telegram into a mobile-first AI ops console. It lets operators set goals, review PRs, check storage, approve actions, and verify a live model smoke test from a lightweight dashboard or directly from their phone.
