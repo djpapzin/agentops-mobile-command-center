@@ -28,7 +28,7 @@ Telegram-first AI ops console for mobile founders and operators, with a dashboar
 - `assets/README-hero.jpg`
 - `assets/README-social.png`
 - `assets/demo-dashboard.png`
-- `assets/agentops-demo.mp4`
+- `assets/agentops-demo-live-screenshots.mp4`
 - `assets/agentops-demo-telegram.mp4`
 
 ## Suggested judge-facing blurb

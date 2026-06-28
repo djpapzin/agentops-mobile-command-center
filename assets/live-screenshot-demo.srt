@@ -1,0 +1,15 @@
+1
+00:00:00,000 --> 00:00:04,000
+Real live dashboard captures instead of slide cards.
+
+2
+00:00:04,000 --> 00:00:10,000
+You can see the live demo button, recent runs, and pending approvals.
+
+3
+00:00:10,000 --> 00:00:15,000
+The mobile view keeps the operator flow readable from a phone.
+
+4
+00:00:15,000 --> 00:00:20,184
+This is what the product looks like in the real world, ready to run.
