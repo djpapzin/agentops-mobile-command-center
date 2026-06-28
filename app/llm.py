@@ -48,7 +48,7 @@ class OpenAICompatibleClient:
             method="POST",
         )
         try:
-            with self.opener(request, self.timeout) as response:
+            with self.opener(request, timeout=self.timeout) as response:
                 data = json.loads(response.read().decode("utf-8"))
         except urllib.error.URLError as exc:  # pragma: no cover - runtime network errors
             raise RuntimeError(f"LLM request failed: {exc}") from exc

@@ -16,7 +16,7 @@ class Settings:
     db_path: Path = Path(os.getenv("APP_DB_PATH", "./data/agentops.sqlite3"))
     public_url: str = os.getenv("APP_PUBLIC_URL", "http://localhost:8000")
     fireworks_model: str = os.getenv(
-        "FIREWORKS_MODEL", "accounts/fireworks/models/llama-v3p1-70b-instruct"
+        "FIREWORKS_MODEL", "accounts/fireworks/models/kimi-k2p6"
     )
     fireworks_api_key: str = os.getenv("FIREWORKS_API_KEY", "")
     fireworks_base_url: str = os.getenv(

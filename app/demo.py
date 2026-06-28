@@ -272,9 +272,9 @@ def handle_command(text: str, *, db_path: Path | None = None) -> CommandResult:
 
     if command == "/live_demo":
         prompt = (
-            "Summarize this mobile operator control-room smoke test in one short line, "
-            "then mention the routing provider and whether the completion was live: "
-            "live smoke test"
+            "Write one short confirmation line for a successful mobile operator smoke test. "
+            "Include the routing provider and whether the completion was live. "
+            "Return only that one line."
         )
         record = _record(
             "live_demo",

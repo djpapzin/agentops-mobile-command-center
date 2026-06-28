@@ -1,6 +1,8 @@
 services:
   app:
     build: .
+    env_file:
+      - .env
     ports:
       - "8000:8000"
     volumes:
@@ -10,6 +12,8 @@ services:
   bot:
     profiles: ["bot"]
     build: .
+    env_file:
+      - .env
     volumes:
       - ./data:/data
     command: python -m app.telegram_bot
