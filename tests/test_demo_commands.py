@@ -22,6 +22,15 @@ def test_review_creates_pending_approval(tmp_path: Path):
     assert approvals and approvals[0]["status"] == "pending"
 
 
+def test_live_demo_reports_live_flag_or_fallback(tmp_path: Path):
+    db = tmp_path / "app.sqlite3"
+    init_db(db)
+    result = handle_command("/live_demo", db_path=db)
+    assert "Live demo" in result.text
+    assert "live" in result.payload
+    assert result.payload["task_type"] == "live_demo"
+
+
 def test_email_triage_returns_ranked_items():
     triage = review_email_triage()
     assert triage["emails"][0]["risk"] == "high"

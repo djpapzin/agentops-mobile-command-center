@@ -270,6 +270,29 @@ def handle_command(text: str, *, db_path: Path | None = None) -> CommandResult:
             payload={**record, "approved": bool(latest), "approved_title": latest["title"] if latest else None},
         )
 
+    if command == "/live_demo":
+        prompt = (
+            "Summarize this mobile operator control-room smoke test in one short line, "
+            "then mention the routing provider and whether the completion was live: "
+            "live smoke test"
+        )
+        record = _record(
+            "live_demo",
+            "Live demo smoke test completed.",
+            expected_cost="medium",
+            confidence=0.65,
+            required_accuracy="high",
+            context="live smoke test",
+            prompt=prompt,
+            system_prompt="You write short smoke-test confirmations for a mobile operator dashboard.",
+            db_path=path,
+        )
+        live_label = "live" if record["live"] else "fallback"
+        return CommandResult(
+            text=f"⚡ Live demo\n{record['result_summary']}\nMode: {live_label}\nModel: {record['model_name']}",
+            payload=record,
+        )
+
     if command in {"/help", "help"}:
         record = _record("status", "Help card requested.", expected_cost="low", db_path=path)
         return CommandResult(

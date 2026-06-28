@@ -22,8 +22,9 @@ Founders and operators often need to supervise agent workflows while away from a
 - `/storage` — inspect disk usage and health
 - `/review_pr` — generate a PR review summary card
 - `/approve` — approve the latest decision card
+- `/live_demo` — run an explicit live-model smoke test
 - demo workflow coverage for PR review, storage health, email triage, and safe-to-merge decisions
-- dashboard for recent runs, cost/token estimates, and approval backlog
+- dashboard for recent runs, cost/token estimates, approval backlog, and the live smoke-test button
 - optional real Telegram bot polling mode
 
 ## Architecture
