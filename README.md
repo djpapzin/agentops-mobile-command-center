@@ -42,11 +42,11 @@ See [docs/architecture.md](docs/architecture.md) for the system map.
 The demo defaults to local/mock behavior so it is safe to run without secrets.
 When you want live integrations, populate `.env` from `.env.example` and wire:
 
-- `FIREWORKS_API_KEY` for remote reasoning/summarization tasks
-- `AMD_API_KEY` for AMD-hosted model execution or evaluation
+- `FIREWORKS_API_KEY` and `FIREWORKS_BASE_URL` for remote reasoning/summarization tasks
+- `AMD_API_KEY` and `AMD_BASE_URL` for AMD-hosted model execution or evaluation
 - `TELEGRAM_BOT_TOKEN` for real Telegram polling mode
 
-The router will still explain *why* a model was selected and log the estimated token/cost footprint even in demo mode.
+The live router uses an OpenAI-compatible chat-completions request path and falls back to the demo text whenever credentials or endpoints are unavailable.
 
 ## Quick start
 
@@ -111,6 +111,7 @@ app/
   db.py                SQLite storage and query helpers
   router.py            Model routing and cost estimates
   demo.py              Mock workflows and command orchestration
+  llm.py               OpenAI-compatible live chat client and routed fallback helper
   telegram_bot.py      Optional polling Telegram bot
   templates/index.html Dashboard UI
 

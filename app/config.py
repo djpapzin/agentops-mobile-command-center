@@ -18,7 +18,15 @@ class Settings:
     fireworks_model: str = os.getenv(
         "FIREWORKS_MODEL", "accounts/fireworks/models/llama-v3p1-70b-instruct"
     )
+    fireworks_api_key: str = os.getenv("FIREWORKS_API_KEY", "")
+    fireworks_base_url: str = os.getenv(
+        "FIREWORKS_BASE_URL", "https://api.fireworks.ai/inference/v1"
+    )
+    fireworks_timeout_seconds: int = int(os.getenv("FIREWORKS_TIMEOUT_SECONDS", "30"))
     amd_model: str = os.getenv("AMD_MODEL", "amd/mi300x-llama-3.1-70b")
+    amd_api_key: str = os.getenv("AMD_API_KEY", "")
+    amd_base_url: str = os.getenv("AMD_BASE_URL", "https://api.amd.com/v1")
+    amd_timeout_seconds: int = int(os.getenv("AMD_TIMEOUT_SECONDS", "30"))
     local_model: str = os.getenv("LOCAL_MODEL", "local/phi-3-mini")
     demo_pr_url: str = os.getenv(
         "DEMO_PR_URL", "https://github.com/example/repo/pull/42"
