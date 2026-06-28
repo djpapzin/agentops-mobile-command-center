@@ -10,6 +10,8 @@ Built for **AMD Developer Hackathon: ACT II** with a lightweight MVP focused on:
 ![AgentOps Mobile Command Center social card](assets/README-social.png)
 
 **Demo video:** [assets/agentops-demo.mp4](assets/agentops-demo.mp4)
+**Telegram cut:** [assets/agentops-demo-telegram.mp4](assets/agentops-demo-telegram.mp4)
+**Submission pack:** [docs/final_submission_pack.md](docs/final_submission_pack.md)
 
 - mobile-first goal control from Telegram
 - deterministic routing between local/cheap and remote AMD/Fireworks models
