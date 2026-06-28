@@ -3,6 +3,8 @@
 Telegram-first AI agent control room for mobile founders and operators.
 Built for **AMD Developer Hackathon: ACT II** with a lightweight MVP focused on:
 
+**Public repo:** https://github.com/djpapzin/agentops-mobile-command-center
+
 - mobile-first goal control from Telegram
 - deterministic routing between local/cheap and remote AMD/Fireworks models
 - PR review summaries and safe-to-merge cards
