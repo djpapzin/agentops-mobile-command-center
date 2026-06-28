@@ -1,8 +1,12 @@
 from __future__ import annotations
 
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
+
+
+def _split_csv(value: str) -> list[str]:
+    return [item.strip() for item in value.split(",") if item.strip()]
 
 
 @dataclass
@@ -19,6 +23,13 @@ class Settings:
     demo_pr_url: str = os.getenv(
         "DEMO_PR_URL", "https://github.com/example/repo/pull/42"
     )
+    telegram_bot_token: str = os.getenv("TELEGRAM_BOT_TOKEN", "")
+    telegram_chat_id: str = os.getenv("TELEGRAM_CHAT_ID", "")
+    telegram_allowed_chat_ids: list[str] = field(
+        default_factory=lambda: _split_csv(os.getenv("TELEGRAM_ALLOWED_CHAT_IDS", ""))
+    )
+    telegram_poll_timeout_seconds: int = int(os.getenv("TELEGRAM_POLL_TIMEOUT_SECONDS", "20"))
+    telegram_poll_interval_seconds: float = float(os.getenv("TELEGRAM_POLL_INTERVAL_SECONDS", "3"))
 
 
 settings = Settings()

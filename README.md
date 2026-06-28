@@ -13,7 +13,7 @@ Built for **AMD Developer Hackathon: ACT II** with a lightweight MVP focused on:
 
 ## Why this exists
 
-Founders and operators often need to supervise agent workflows while away from a laptop. This project turns Telegram into a control surface for assigning goals, checking status, reviewing PRs, and approving the next step without opening a desktop IDE.
+Founders and operators often need to supervise agent workflows while away from a laptop. This project turns Telegram into a control surface for assigning goals, checking status, reviewing pull requests, and approving the next step without opening a desktop IDE.
 
 ## What the MVP does
 
@@ -24,11 +24,12 @@ Founders and operators often need to supervise agent workflows while away from a
 - `/approve` — approve the latest decision card
 - demo workflow coverage for PR review, storage health, email triage, and safe-to-merge decisions
 - dashboard for recent runs, cost/token estimates, and approval backlog
+- optional real Telegram bot polling mode
 
 ## Architecture
 
 - **Backend:** FastAPI + SQLite
-- **Bot layer:** transport-agnostic Telegram command handler with demo mode
+- **Bot layer:** transport-agnostic Telegram command handler with demo mode plus optional polling bot
 - **Routing:** rule-based model router that selects local, Fireworks, or AMD-hosted models by task type, confidence, and accuracy needs
 - **Storage:** SQLite event/run log plus lightweight state tables
 - **UI:** minimal dashboard rendered from the same API used by the bot
@@ -43,6 +44,7 @@ When you want live integrations, populate `.env` from `.env.example` and wire:
 
 - `FIREWORKS_API_KEY` for remote reasoning/summarization tasks
 - `AMD_API_KEY` for AMD-hosted model execution or evaluation
+- `TELEGRAM_BOT_TOKEN` for real Telegram polling mode
 
 The router will still explain *why* a model was selected and log the estimated token/cost footprint even in demo mode.
 
@@ -73,6 +75,18 @@ curl -s http://localhost:8000/api/telegram/demo   -H 'Content-Type: application/
 curl -s http://localhost:8000/api/telegram/demo   -H 'Content-Type: application/json'   -d '{"text":"/review_pr https://github.com/example/repo/pull/42"}' | jq
 ```
 
+To run a real Telegram polling bot, export `TELEGRAM_BOT_TOKEN` and start:
+
+```bash
+python -m app.telegram_bot
+```
+
+Or with Docker Compose:
+
+```bash
+docker-compose --profile bot up --build
+```
+
 For a local-only workflow, you can also call the API directly:
 
 ```bash
@@ -97,7 +111,8 @@ app/
   db.py                SQLite storage and query helpers
   router.py            Model routing and cost estimates
   demo.py              Mock workflows and command orchestration
-  templates/index.html  Dashboard UI
+  telegram_bot.py      Optional polling Telegram bot
+  templates/index.html Dashboard UI
 
 docs/
   architecture.md
@@ -108,6 +123,7 @@ tests/
   test_router.py
   test_demo_commands.py
   test_api.py
+  test_telegram_bot.py
 ```
 
 ## Public-readiness notes
