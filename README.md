@@ -103,6 +103,20 @@ See [docs/demo_script.md](docs/demo_script.md).
 
 See [docs/submission_checklist.md](docs/submission_checklist.md).
 
+## Demo status
+
+The current hackathon demo is **live and verified**:
+
+- `/api/demo/live-demo` returns `live=true`
+- Fireworks model routing is wired through `accounts/fireworks/models/kimi-k2p6`
+- Docker Compose loads the project `.env`
+- The dashboard includes a live smoke-test button for mobile demo use
+
+Recommended demo path:
+1. Open the dashboard
+2. Click **Live demo smoke test**
+3. Show the returned `live=true` result
+
 ## Repo layout
 
 ```text
