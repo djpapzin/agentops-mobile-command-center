@@ -1,7 +1,12 @@
 from pathlib import Path
 
 from app.db import init_db, recent_approvals, summary
-from app.demo import build_safe_to_merge_card, handle_command, review_email_triage
+from app.demo import (
+    _operator_one_liner,
+    build_safe_to_merge_card,
+    handle_command,
+    review_email_triage,
+)
 
 
 def test_goal_updates_state(tmp_path: Path):
@@ -29,6 +34,14 @@ def test_live_demo_reports_live_flag_or_fallback(tmp_path: Path):
     assert "Live demo" in result.text
     assert "live" in result.payload
     assert result.payload["task_type"] == "live_demo"
+    assert len(result.payload["result_summary"].splitlines()) == 1
+
+
+def test_operator_one_liner_replaces_verbose_model_copy():
+    verbose = "The user wants a single short confirmation line. Requirements: include provider."
+    assert _operator_one_liner(verbose, provider="fireworks", live=True) == (
+        "Smoke test completed via fireworks; completion mode: live."
+    )
 
 
 def test_email_triage_returns_ranked_items():

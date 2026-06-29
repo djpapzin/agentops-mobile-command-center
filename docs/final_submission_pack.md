@@ -40,3 +40,5 @@ AgentOps Mobile Command Center turns Telegram into a mobile-first AI ops console
 - No secrets included
 - Repo and PR are public
 - Live demo path is documented in the README
+- Verified on 2026-06-29: tests pass, Docker image builds, container smoke passes, and `/api/demo/live-demo` returns `live=true`
+- Official hackathon page: https://lablab.ai/ai-hackathons/amd-developer-hackathon-act-ii

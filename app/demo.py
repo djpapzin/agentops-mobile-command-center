@@ -55,6 +55,20 @@ def _ensure_db(db_path: Path | None = None) -> Path:
     return path
 
 
+def _operator_one_liner(text: str, *, provider: str, live: bool) -> str:
+    """Keep live demo copy short even when a model returns verbose reasoning."""
+    first_line = next((line.strip() for line in text.splitlines() if line.strip()), "")
+    looks_verbose = (
+        len(first_line) > 180
+        or first_line.lower().startswith("the user wants")
+        or "requirements:" in first_line.lower()
+    )
+    if not first_line or looks_verbose:
+        mode = "live" if live else "fallback"
+        return f"Smoke test completed via {provider}; completion mode: {mode}."
+    return first_line[:180]
+
+
 def _record(
     task_type: str,
     result_summary: str,
@@ -286,6 +300,11 @@ def handle_command(text: str, *, db_path: Path | None = None) -> CommandResult:
             prompt=prompt,
             system_prompt="You write short smoke-test confirmations for a mobile operator dashboard.",
             db_path=path,
+        )
+        record["result_summary"] = _operator_one_liner(
+            record["result_summary"],
+            provider=record["model_provider"],
+            live=record["live"],
         )
         live_label = "live" if record["live"] else "fallback"
         return CommandResult(

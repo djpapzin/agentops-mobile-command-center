@@ -117,11 +117,13 @@ See [docs/submission_checklist.md](docs/submission_checklist.md).
 
 ## Demo status
 
-The current hackathon demo is **live and verified**:
+The current hackathon demo is **live and verified** as of 2026-06-29:
 
 - `/api/demo/live-demo` returns `live=true`
 - Fireworks model routing is wired through `accounts/fireworks/models/kimi-k2p6`
 - Docker Compose loads the project `.env`
+- Docker image smoke test passes on `127.0.0.1:8011`
+- Local tests pass: `16 passed`
 - The dashboard includes a live smoke-test button for mobile demo use
 
 Recommended demo path:
