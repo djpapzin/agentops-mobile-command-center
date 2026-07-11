@@ -17,6 +17,7 @@ from .db import (
     summary,
     init_db,
 )
+from .llm import routed_completion
 from .router import select_model
 
 
@@ -54,6 +55,20 @@ def _ensure_db(db_path: Path | None = None) -> Path:
     return path
 
 
+def _operator_one_liner(text: str, *, provider: str, live: bool) -> str:
+    """Keep live demo copy short even when a model returns verbose reasoning."""
+    first_line = next((line.strip() for line in text.splitlines() if line.strip()), "")
+    looks_verbose = (
+        len(first_line) > 180
+        or first_line.lower().startswith("the user wants")
+        or "requirements:" in first_line.lower()
+    )
+    if not first_line or looks_verbose:
+        mode = "live" if live else "fallback"
+        return f"Smoke test completed via {provider}; completion mode: {mode}."
+    return first_line[:180]
+
+
 def _record(
     task_type: str,
     result_summary: str,
@@ -63,23 +78,53 @@ def _record(
     required_accuracy: str = "medium",
     context: str = "",
     approval_status: str = "none",
+    prompt: str | None = None,
+    system_prompt: str = "You are a helpful mobile-first operator assistant.",
     db_path: Path | None = None,
 ) -> dict[str, Any]:
     path = _ensure_db(db_path)
-    decision = select_model(
-        task_type,
-        expected_cost=expected_cost,
-        confidence=confidence,
-        required_accuracy=required_accuracy,
-        context=context,
-    )
+    live = None
+    if prompt:
+        live = routed_completion(
+            task_type,
+            prompt,
+            expected_cost=expected_cost,
+            confidence=confidence,
+            required_accuracy=required_accuracy,
+            context=context,
+            fallback_text=result_summary,
+            system_prompt=system_prompt,
+        )
+        result_summary = live["text"]
+        provider = live["provider"]
+        model_name = live["model"]
+        estimated_tokens = live["estimated_tokens"]
+        estimated_cost_usd = live["estimated_cost_usd"]
+        decision_reason = live["reason"]
+        live_used = live["live"]
+        live_error = live["live_error"]
+    else:
+        decision = select_model(
+            task_type,
+            expected_cost=expected_cost,
+            confidence=confidence,
+            required_accuracy=required_accuracy,
+            context=context,
+        )
+        provider = decision.provider
+        model_name = decision.model
+        estimated_tokens = decision.estimated_tokens
+        estimated_cost_usd = decision.estimated_cost_usd
+        decision_reason = decision.reason
+        live_used = False
+        live_error = None
     run_id = log_run(
         task_type=task_type,
-        model_provider=decision.provider,
-        model_name=decision.model,
-        estimated_tokens=decision.estimated_tokens,
-        estimated_cost_usd=decision.estimated_cost_usd,
-        decision_reason=decision.reason,
+        model_provider=provider,
+        model_name=model_name,
+        estimated_tokens=estimated_tokens,
+        estimated_cost_usd=estimated_cost_usd,
+        decision_reason=decision_reason,
         result_summary=result_summary,
         approval_status=approval_status,
         path=path,
@@ -87,13 +132,15 @@ def _record(
     return {
         "run_id": run_id,
         "task_type": task_type,
-        "model_provider": decision.provider,
-        "model_name": decision.model,
-        "estimated_tokens": decision.estimated_tokens,
-        "estimated_cost_usd": decision.estimated_cost_usd,
-        "decision_reason": decision.reason,
+        "model_provider": provider,
+        "model_name": model_name,
+        "estimated_tokens": estimated_tokens,
+        "estimated_cost_usd": estimated_cost_usd,
+        "decision_reason": decision_reason,
         "result_summary": result_summary,
         "approval_status": approval_status,
+        "live": live_used,
+        "live_error": live_error,
     }
 
 
@@ -113,6 +160,7 @@ def handle_command(text: str, *, db_path: Path | None = None) -> CommandResult:
             confidence=0.7,
             required_accuracy="medium",
             context=goal,
+            prompt=f"Turn this goal into a concise mobile-friendly action item list: {goal}",
             db_path=path,
         )
         return CommandResult(
@@ -197,6 +245,12 @@ def handle_command(text: str, *, db_path: Path | None = None) -> CommandResult:
             required_accuracy="high",
             context=pr_url,
             approval_status="pending",
+            prompt=(
+                "Review this pull request for a mobile operator and return a concise summary, "
+                "risk call, and next action: "
+                f"{pr_url}"
+            ),
+            system_prompt="You write tight GitHub review summaries for mobile operators.",
             db_path=path,
         )
         approval_id = add_approval(card["title"], {**card, **record}, status="pending", path=path)
@@ -221,11 +275,41 @@ def handle_command(text: str, *, db_path: Path | None = None) -> CommandResult:
             required_accuracy="high",
             context=approved_text,
             approval_status="approved" if latest else "none",
+            prompt=f"Summarize the approval decision and next step: {approved_text}",
+            system_prompt="You write crisp approval acknowledgements for operators.",
             db_path=path,
         )
         return CommandResult(
             text=f"✅ {approved_text}\nModel: {record['model_name']}",
             payload={**record, "approved": bool(latest), "approved_title": latest["title"] if latest else None},
+        )
+
+    if command == "/live_demo":
+        prompt = (
+            "Write one short confirmation line for a successful mobile operator smoke test. "
+            "Include the routing provider and whether the completion was live. "
+            "Return only that one line."
+        )
+        record = _record(
+            "live_demo",
+            "Live demo smoke test completed.",
+            expected_cost="medium",
+            confidence=0.65,
+            required_accuracy="high",
+            context="live smoke test",
+            prompt=prompt,
+            system_prompt="You write short smoke-test confirmations for a mobile operator dashboard.",
+            db_path=path,
+        )
+        record["result_summary"] = _operator_one_liner(
+            record["result_summary"],
+            provider=record["model_provider"],
+            live=record["live"],
+        )
+        live_label = "live" if record["live"] else "fallback"
+        return CommandResult(
+            text=f"⚡ Live demo\n{record['result_summary']}\nMode: {live_label}\nModel: {record['model_name']}",
+            payload=record,
         )
 
     if command in {"/help", "help"}:
@@ -249,6 +333,11 @@ def review_email_triage(db_path: Path | None = None) -> dict[str, Any]:
         confidence=0.76,
         required_accuracy="medium",
         context="; ".join(item["subject"] for item in ranked),
+        prompt=(
+            "Rank these inbox items by urgency and give one-line recommended actions for each: "
+            + "; ".join(f"{item['from']} | {item['subject']}" for item in ranked)
+        ),
+        system_prompt="You prioritize inboxes for a mobile operator.",
         db_path=path,
     )
     return {**record, "emails": ranked}

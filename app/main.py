@@ -91,6 +91,12 @@ def demo_email_triage():
     return review_email_triage()
 
 
+@app.get("/api/demo/live-demo")
+def demo_live_demo():
+    _ensure_db()
+    return handle_command("/live_demo").payload
+
+
 @app.get("/api/demo/safe-to-merge")
 def demo_safe_to_merge():
     _ensure_db()

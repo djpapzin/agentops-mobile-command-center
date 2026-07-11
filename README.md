@@ -3,6 +3,20 @@
 Telegram-first AI agent control room for mobile founders and operators.
 Built for **AMD Developer Hackathon: ACT II** with a lightweight MVP focused on:
 
+**Public repo:** https://github.com/djpapzin/agentops-mobile-command-center
+
+![AgentOps Mobile Command Center hero banner](assets/README-hero.jpg)
+
+![AgentOps Mobile Command Center social card](assets/README-social.png)
+
+**Demo teaser:** [assets/agentops-demo-teaser.mp4](assets/agentops-demo-teaser.mp4)
+**Teaser script:** [docs/demo_teaser_script.md](docs/demo_teaser_script.md)
+**Demo video:** [assets/agentops-demo-live-screenshots.mp4](assets/agentops-demo-live-screenshots.mp4)
+**Archive demo:** [assets/agentops-demo.mp4](assets/agentops-demo.mp4)
+**Subtitled demo:** [assets/agentops-demo-subtitled.mp4](assets/agentops-demo-subtitled.mp4)
+**Telegram cut:** [assets/agentops-demo-telegram.mp4](assets/agentops-demo-telegram.mp4)
+**Submission pack:** [docs/final_submission_pack.md](docs/final_submission_pack.md)
+
 - mobile-first goal control from Telegram
 - deterministic routing between local/cheap and remote AMD/Fireworks models
 - PR review summaries and safe-to-merge cards
@@ -11,7 +25,7 @@ Built for **AMD Developer Hackathon: ACT II** with a lightweight MVP focused on:
 
 ## Why this exists
 
-Founders and operators often need to supervise agent workflows while away from a laptop. This project turns Telegram into a control surface for assigning goals, checking status, reviewing PRs, and approving the next step without opening a desktop IDE.
+Founders and operators often need to supervise agent workflows while away from a laptop. This project turns Telegram into a control surface for assigning goals, checking status, reviewing pull requests, and approving the next step without opening a desktop IDE.
 
 ## What the MVP does
 
@@ -20,13 +34,15 @@ Founders and operators often need to supervise agent workflows while away from a
 - `/storage` — inspect disk usage and health
 - `/review_pr` — generate a PR review summary card
 - `/approve` — approve the latest decision card
+- `/live_demo` — run an explicit live-model smoke test
 - demo workflow coverage for PR review, storage health, email triage, and safe-to-merge decisions
-- dashboard for recent runs, cost/token estimates, and approval backlog
+- dashboard for recent runs, cost/token estimates, approval backlog, and the live smoke-test button
+- optional real Telegram bot polling mode
 
 ## Architecture
 
 - **Backend:** FastAPI + SQLite
-- **Bot layer:** transport-agnostic Telegram command handler with demo mode
+- **Bot layer:** transport-agnostic Telegram command handler with demo mode plus optional polling bot
 - **Routing:** rule-based model router that selects local, Fireworks, or AMD-hosted models by task type, confidence, and accuracy needs
 - **Storage:** SQLite event/run log plus lightweight state tables
 - **UI:** minimal dashboard rendered from the same API used by the bot
@@ -39,10 +55,11 @@ See [docs/architecture.md](docs/architecture.md) for the system map.
 The demo defaults to local/mock behavior so it is safe to run without secrets.
 When you want live integrations, populate `.env` from `.env.example` and wire:
 
-- `FIREWORKS_API_KEY` for remote reasoning/summarization tasks
-- `AMD_API_KEY` for AMD-hosted model execution or evaluation
+- `FIREWORKS_API_KEY` and `FIREWORKS_BASE_URL` for remote reasoning/summarization tasks
+- `AMD_API_KEY` and `AMD_BASE_URL` for AMD-hosted model execution or evaluation
+- `TELEGRAM_BOT_TOKEN` for real Telegram polling mode
 
-The router will still explain *why* a model was selected and log the estimated token/cost footprint even in demo mode.
+The live router uses an OpenAI-compatible chat-completions request path and falls back to the demo text whenever credentials or endpoints are unavailable.
 
 ## Quick start
 
@@ -71,6 +88,18 @@ curl -s http://localhost:8000/api/telegram/demo   -H 'Content-Type: application/
 curl -s http://localhost:8000/api/telegram/demo   -H 'Content-Type: application/json'   -d '{"text":"/review_pr https://github.com/example/repo/pull/42"}' | jq
 ```
 
+To run a real Telegram polling bot, export `TELEGRAM_BOT_TOKEN` and start:
+
+```bash
+python -m app.telegram_bot
+```
+
+Or with Docker Compose:
+
+```bash
+docker-compose --profile bot up --build
+```
+
 For a local-only workflow, you can also call the API directly:
 
 ```bash
@@ -86,6 +115,22 @@ See [docs/demo_script.md](docs/demo_script.md).
 
 See [docs/submission_checklist.md](docs/submission_checklist.md).
 
+## Demo status
+
+The current hackathon demo is **live and verified** as of 2026-06-29:
+
+- `/api/demo/live-demo` returns `live=true`
+- Fireworks model routing is wired through `accounts/fireworks/models/kimi-k2p6`
+- Docker Compose loads the project `.env`
+- Docker image smoke test passes on `127.0.0.1:8011`
+- Local tests pass: `16 passed`
+- The dashboard includes a live smoke-test button for mobile demo use
+
+Recommended demo path:
+1. Open the dashboard
+2. Click **Live demo smoke test**
+3. Show the returned `live=true` result
+
 ## Repo layout
 
 ```text
@@ -95,7 +140,9 @@ app/
   db.py                SQLite storage and query helpers
   router.py            Model routing and cost estimates
   demo.py              Mock workflows and command orchestration
-  templates/index.html  Dashboard UI
+  llm.py               OpenAI-compatible live chat client and routed fallback helper
+  telegram_bot.py      Optional polling Telegram bot
+  templates/index.html Dashboard UI
 
 docs/
   architecture.md
@@ -106,6 +153,7 @@ tests/
   test_router.py
   test_demo_commands.py
   test_api.py
+  test_telegram_bot.py
 ```
 
 ## Public-readiness notes

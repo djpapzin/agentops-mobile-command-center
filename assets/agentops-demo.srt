@@ -1,0 +1,19 @@
+1
+00:00:00,000 --> 00:00:06,500
+AgentOps Mobile Command Center is a Telegram-first AI ops console
+for mobile founders and operators.
+
+2
+00:00:06,500 --> 00:00:13,500
+Open the dashboard to see recent runs, approvals, storage health,
+and the live demo smoke-test button.
+
+3
+00:00:13,500 --> 00:00:20,500
+The live route is backed by Fireworks and returns live=true,
+so you can verify the demo path on the spot.
+
+4
+00:00:20,500 --> 00:00:27,000
+From mobile, you can review pull requests, check status,
+and approve the next step.
