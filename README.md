@@ -169,4 +169,4 @@ tests/
 
 ## License
 
-Choose the license that matches your hackathon submission needs before public release.
+MIT License -- see LICENSE.
